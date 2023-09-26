@@ -1,0 +1,79 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  background-color: #f2f2f2;
+}
+
+.formContainer {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+  background-color: #fff;
+  padding: 20px;
+  box-shadow: 0px 0px 5px #ccc;
+  border-radius: 5px;
+  margin-top: 6vh;
+}
+
+.inputArea input {
+  width: 120px;
+  padding: 0 10px;
+  border: 1px solid #bbb;
+  border-radius: 5px;
+  height: 40px;
+  margin-right: 13vw;
+  margin-top: 4vh;
+}
+
+.inputArea button {
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  border: none;
+  background-color: rgb(24, 23, 23);
+  color: white;
+  height: 42px;
+}
+
+.listaProdutos {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+  background-color: #fff;
+  padding: 20px;
+  box-shadow: 0px 0px 5px #ccc;
+  border-radius: 5px;
+  margin-top: 6vh;
+}
+
+.produtos ul li {
+  list-style: none;
+  font-size: 20px;
+}
+
+/* Estilo para os itens da lista */
+.item-lista {
+  display: flex;
+  justify-content: space-between; /* Alinha os itens horizontalmente ao espaço entre eles */
+  align-items: center; /* Alinha os itens verticalmente ao centro */
+  margin-bottom: 10px; /* Espaçamento entre os itens */
+}
+
+.item-lista button {
+  margin-left: 10px; /* Espaço à esquerda dos botões para separá-los dos itens */
+}
+
+.botao-container {
+  margin-left: 100px;
+}

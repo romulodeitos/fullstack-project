@@ -11,8 +11,8 @@ function App() {
   const [produtos, setProdutos] = useState([]);
   const [nome, setNome] = useState("");
   const [preco, setPreco] = useState("");
-  const [produtoId, setProdutoId] = useState("");
-  const [produtoDeleteId, setProdutoDeleteId] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [produtoParaEditar, setProdutoParaEditar] = useState(null);
 
   useEffect(() => {
     api.get("/").then((response) => {
@@ -32,76 +32,119 @@ function App() {
       });
   }
 
-  function updateProduto() {
-    api
-      .put(`/${produtoId}`, {
-        nome,
-        preco,
-      })
-      .then((response) => {
-        setNome("");
-        setPreco("");
-        setProdutoId("");
-      });
+  function handleDeleteProduto(produtoId) {
+    api.delete(`/${produtoId}`).then((response) => {
+      console.log(response);
+
+      const updatedProdutos = produtos.filter(
+        (produto) => produto.id !== produtoId
+      );
+      setProdutos(updatedProdutos);
+    });
   }
 
-  function deleteProduto() {
+  function handleEditProduto(produto) {
+    setProdutoParaEditar(produto);
+    setIsModalOpen(true);
+  }
+
+  function EditModal({ produto, onClose, onSave }) {
+    const [novoNome, setNovoNome] = useState(produto.nome);
+    const [novoPreco, setNovoPreco] = useState(produto.preco);
+
+    const handleSave = () => {
+      onSave(produto.id, novoNome, novoPreco);
+      onClose();
+    };
+
+    return (
+      <div className="modal">
+        <div className="modal-content">
+          <h2>Editar Produto</h2>
+          <input
+            placeholder="Novo Nome"
+            value={novoNome}
+            onChange={(e) => setNovoNome(e.target.value)}
+          />
+          <input
+            placeholder="Novo Preço"
+            value={novoPreco}
+            onChange={(e) => setNovoPreco(e.target.value)}
+          />
+          <button onClick={handleSave}>Salvar</button>
+          <button onClick={onClose}>Cancelar</button>
+        </div>
+      </div>
+    );
+  }
+
+  function handleUpdateProduto(id, novoNome, novoPreco) {
     api
-      .delete(`/${produtoDeleteId}`, {
-        produtoDeleteId,
+      .put(`/${id}`, {
+        nome: novoNome,
+        preco: novoPreco,
       })
       .then((response) => {
         console.log(response);
+
+        // Atualize o estado produtos com os dados atualizados
+        const updatedProdutos = produtos.map((produto) =>
+          produto.id === id
+            ? { ...produto, nome: novoNome, preco: novoPreco }
+            : produto
+        );
+        setProdutos(updatedProdutos);
+
+        // Feche o modal
+        setIsModalOpen(false);
       });
   }
 
   return (
     <div>
-      <h1>Produtos</h1>
-      <ul>
-        {produtos.map((produto) => (
-          <li key={produto.nome}>
-            Nome: {produto.nome} - Preço: {produto.preco}
-          </li>
-        ))}
-      </ul>
-
-      <h2>Adicionar novo Produto</h2>
-      <input
-        placeholder="Nome"
-        onChange={(event) => setNome(event.target.value)}
-      />
-      <input
-        placeholder="Preço"
-        onChange={(event) => setPreco(event.target.value)}
-      />
-      <button onClick={newProduto}>Adicionar Produto</button>
-
-      <h2>Atualizar Produto</h2>
-      <input
-        placeholder="ID do Produto"
-        value={produtoId}
-        onChange={(event) => setProdutoId(event.target.value)}
-      />
-      <input
-        placeholder="Novo Nome"
-        value={nome}
-        onChange={(event) => setNome(event.target.value)}
-      />
-      <input
-        placeholder="Novo Preço"
-        value={preco}
-        onChange={(event) => setPreco(event.target.value)}
-      />
-      <button onClick={updateProduto}>Atualizar Produto</button>
-
-      <h2>Deletar Produto</h2>
-      <input
-        placeholder="ID do Produto"
-        value={produtoDeleteId}
-        onChange={(event) => setProdutoDeleteId(event.target.value)}
-      />
-      <button onClick={deleteProduto}>Deletar Produto</button>
+      <div className="formContainer">
+        <div className="inputArea">
+          <h1>Cadastrar Produto</h1>
+          <input
+            placeholder="Nome"
+            onChange={(event) => setNome(event.target.value)}
+          />
+          <input
+            placeholder="Preço / und-kg"
+            onChange={(event) => setPreco(event.target.value)}
+          />
+          <button onClick={newProduto}>Adicionar Produto</button>
+        </div>
+      </div>
+      <div className="listaProdutos">
+        <div className="produtos">
+          <h1>Produtos</h1>
+          <ul>
+            {produtos.map((produto) => (
+              <li className="item-lista" key={produto.nome}>
+                Nome: {produto.nome} -- Preço: {produto.preco}
+                <div className="botao-container">
+                  <button onClick={() => handleEditProduto(produto)}>
+                    Editar
+                  </button>
+                  <button onClick={() => handleDeleteProduto(produto.id)}>
+                    Deletar
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      {isModalOpen && (
+        <EditModal
+          produto={produtoParaEditar}
+          onClose={() => setIsModalOpen(false)}
+          onSave={(id, novoNome, novoPreco) =>
+            handleUpdateProduto(id, novoNome, novoPreco)
+          }
+        />
+      )}
     </div>
   );
 }
