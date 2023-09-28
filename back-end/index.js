@@ -1,8 +1,8 @@
 const express = require("express");
-const app = express();
 const { PrismaClient } = require("@prisma/client");
 const cors = require("cors");
 
+const app = express();
 const prisma = new PrismaClient();
 
 app.use(express.json());
@@ -20,9 +20,8 @@ app.post("/", async (req, res) => {
 
 app.put("/:id", async (req, res) => {
   const { id } = req.params;
-  const { nome, preco } = req.body;
-
   const productId = parseInt(id);
+  const { nome, preco, unidade } = req.body;
 
   const updateProduto = await prisma.produtos.update({
     where: {
@@ -31,6 +30,7 @@ app.put("/:id", async (req, res) => {
     data: {
       nome: nome,
       preco: preco,
+      unidade: unidade,
     },
   });
 
@@ -39,8 +39,9 @@ app.put("/:id", async (req, res) => {
 
 app.delete("/:id", async (req, res) => {
   const { id } = req.params;
+  const productId = parseInt(id);
   const deleteProduto = await prisma.produtos.delete({
-    where: { id: parseInt(id) },
+    where: { id: productId },
   });
 
   res.json(deleteProduto);

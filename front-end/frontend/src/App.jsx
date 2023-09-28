@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-
 import axios from "axios";
 import "./App.css";
 
@@ -11,6 +10,7 @@ function App() {
   const [produtos, setProdutos] = useState([]);
   const [nome, setNome] = useState("");
   const [preco, setPreco] = useState("");
+  const [unidade, setUnidade] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [produtoParaEditar, setProdutoParaEditar] = useState(null);
 
@@ -25,9 +25,12 @@ function App() {
     api
       .post("/", {
         nome,
-        preco,
+        preco: parseFloat(preco),
+        unidade,
       })
       .then((response) => {
+        const novoProduto = response.data;
+        setProdutos([...produtos, novoProduto]);
         console.log(response);
       });
   }
@@ -51,9 +54,10 @@ function App() {
   function EditModal({ produto, onClose, onSave }) {
     const [novoNome, setNovoNome] = useState(produto.nome);
     const [novoPreco, setNovoPreco] = useState(produto.preco);
+    const [novaUnidade, setNovaUnidade] = useState(produto.unidade);
 
     const handleSave = () => {
-      onSave(produto.id, novoNome, novoPreco);
+      onSave(produto.id, novoNome, novoPreco, novaUnidade);
       onClose();
     };
 
@@ -71,6 +75,11 @@ function App() {
             value={novoPreco}
             onChange={(e) => setNovoPreco(e.target.value)}
           />
+          <input
+            placeholder="Nova Unidade"
+            value={novaUnidade}
+            onChange={(e) => setNovaUnidade(e.target.value)}
+          />
           <button onClick={handleSave}>Salvar</button>
           <button onClick={onClose}>Cancelar</button>
         </div>
@@ -78,24 +87,28 @@ function App() {
     );
   }
 
-  function handleUpdateProduto(id, novoNome, novoPreco) {
+  function handleUpdateProduto(id, novoNome, novoPreco, novaUnidade) {
     api
       .put(`/${id}`, {
         nome: novoNome,
-        preco: novoPreco,
+        preco: parseFloat(novoPreco),
+        unidade: novaUnidade,
       })
       .then((response) => {
         console.log(response);
 
-        // Atualize o estado produtos com os dados atualizados
         const updatedProdutos = produtos.map((produto) =>
           produto.id === id
-            ? { ...produto, nome: novoNome, preco: novoPreco }
+            ? {
+                ...produto,
+                nome: novoNome,
+                preco: parseFloat(novoPreco),
+                unidade: novaUnidade,
+              }
             : produto
         );
         setProdutos(updatedProdutos);
 
-        // Feche o modal
         setIsModalOpen(false);
       });
   }
@@ -110,8 +123,12 @@ function App() {
             onChange={(event) => setNome(event.target.value)}
           />
           <input
-            placeholder="Preço / und-kg"
+            placeholder="Preço"
             onChange={(event) => setPreco(event.target.value)}
+          />
+          <input
+            placeholder="Unidade"
+            onChange={(event) => setUnidade(event.target.value)}
           />
           <button onClick={newProduto}>Adicionar Produto</button>
         </div>
@@ -122,7 +139,8 @@ function App() {
           <ul>
             {produtos.map((produto) => (
               <li className="item-lista" key={produto.nome}>
-                Nome: {produto.nome} -- Preço: {produto.preco}
+                Nome: {produto.nome} -- Preço: {produto.preco} -{" "}
+                {produto.unidade}
                 <div className="botao-container">
                   <button onClick={() => handleEditProduto(produto)}>
                     Editar
@@ -140,8 +158,8 @@ function App() {
         <EditModal
           produto={produtoParaEditar}
           onClose={() => setIsModalOpen(false)}
-          onSave={(id, novoNome, novoPreco) =>
-            handleUpdateProduto(id, novoNome, novoPreco)
+          onSave={(id, novoNome, novoPreco, novaUnidade) =>
+            handleUpdateProduto(id, novoNome, novoPreco, novaUnidade)
           }
         />
       )}
