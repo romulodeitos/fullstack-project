@@ -24,7 +24,7 @@ Na parte de banco de dados se deve baixar o postgreSQL e se quiser acompanhá-lo
 
 ## Como rodar este projeto
 
-Rodar o comando "npm run dev" no terminal da pasta back-end e no terminal da pasta frontend.
+Rodar o comando `npm run dev` no terminal da pasta back-end e no terminal da pasta frontend.
 
 ## Porque criei este projeto
 
